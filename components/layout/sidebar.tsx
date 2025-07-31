@@ -108,17 +108,23 @@ export function Sidebar({ className }: SidebarProps) {
         // Fetch current month transactions com filtro otimizado
         supabase
           .from('transactions')
-          .select('amount, type')
+          .select('amount, type, date')
           .eq('user_id', user?.id)
-          .gte('date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString())
-          .lte('date', new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString())
       ])
 
       // Processar resultados
       const pendingScheduled = scheduledResult.data?.length || 0
       const activeProjects = projectsResult.data?.length || 0
       
-      const currentMonthTransactions = transactionsResult.data || []
+      // Filtrar transações do mês atual (mesma lógica do dashboard)
+      const currentMonth = new Date().getMonth()
+      const currentYear = new Date().getFullYear()
+      
+      const currentMonthTransactions = transactionsResult.data?.filter(t => {
+        const date = new Date(t.date)
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear
+      }) || []
+      
       const income = currentMonthTransactions
         .filter(t => t.type === 'income')
         .reduce((sum, t) => sum + t.amount, 0)
@@ -263,8 +269,6 @@ export function Sidebar({ className }: SidebarProps) {
                   {new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
                   }).format(stats.monthlyBalance)}
                 </span>
               </div>
