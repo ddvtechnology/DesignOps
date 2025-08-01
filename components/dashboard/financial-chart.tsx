@@ -16,15 +16,21 @@ const CartesianGridFixed = CartesianGrid as any
 const TooltipFixed = Tooltip as any
 
 interface FinancialChartProps {
-  data: Array<{
+  monthlyData: Array<{
     month: string
+    income: number
+    expenses: number
+    balance: number
+  }>
+  currentMonthData: Array<{
+    day: string
     income: number
     expenses: number
     balance: number
   }>
 }
 
-export function FinancialChart({ data }: FinancialChartProps) {
+export function FinancialChart({ monthlyData, currentMonthData }: FinancialChartProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -50,13 +56,13 @@ export function FinancialChart({ data }: FinancialChartProps) {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-            <span>Fluxo de Caixa</span>
+            <span>Fluxo de Caixa Mensal</span>
           </CardTitle>
-          <CardDescription>Receitas vs Despesas nos últimos 6 meses</CardDescription>
+          <CardDescription>Receitas vs Despesas do ano atual</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainerFixed width="100%" height={300}>
-            <AreaChartFixed data={data}>
+            <AreaChartFixed data={monthlyData}>
               <defs>
                 <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -111,22 +117,26 @@ export function FinancialChart({ data }: FinancialChartProps) {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
-            <span>Saldo Mensal</span>
+            <span>Fluxo do Mês Atual</span>
           </CardTitle>
-          <CardDescription>Evolução do saldo ao longo do tempo</CardDescription>
+          <CardDescription>Receitas vs Despesas por dia no mês atual</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainerFixed width="100%" height={300}>
-            <BarChartFixed data={data}>
+            <BarChartFixed data={currentMonthData}>
               <defs>
-                <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                <linearGradient id="currentMonthIncomeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0.8}/>
+                </linearGradient>
+                <linearGradient id="currentMonthExpenseGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0.8}/>
                 </linearGradient>
               </defs>
               <CartesianGridFixed strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxisFixed 
-                dataKey="month" 
+                dataKey="day" 
                 stroke="#6b7280"
                 fontSize={12}
               />
@@ -144,9 +154,15 @@ export function FinancialChart({ data }: FinancialChartProps) {
               />
               <TooltipFixed content={<CustomTooltip />} />
               <BarFixed 
-                dataKey="balance" 
-                fill="url(#balanceGradient)"
-                name="Saldo"
+                dataKey="income" 
+                fill="url(#currentMonthIncomeGradient)"
+                name="Receitas"
+                radius={[4, 4, 0, 0]}
+              />
+              <BarFixed 
+                dataKey="expenses" 
+                fill="url(#currentMonthExpenseGradient)"
+                name="Despesas"
                 radius={[4, 4, 0, 0]}
               />
             </BarChartFixed>

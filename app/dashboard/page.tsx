@@ -21,7 +21,8 @@ export default function DashboardPage() {
     totalExpenses: 0,
     scheduledCount: 0
   })
-  const [chartData, setChartData] = useState<any[]>([])
+  const [monthlyChartData, setMonthlyChartData] = useState<any[]>([])
+  const [currentMonthDailyData, setCurrentMonthDailyData] = useState<any[]>([])
   const [recentTransactions, setRecentTransactions] = useState<any[]>([])
   const [scheduledTransactions, setScheduledTransactions] = useState<any[]>([])
 
@@ -66,16 +67,15 @@ export default function DashboardPage() {
 
       const balance = totalIncome - totalExpenses
 
-      // Prepare chart data (last 6 months)
+      // Prepare monthly chart data (current year - all 12 months)
       const monthsData = []
-      for (let i = 5; i >= 0; i--) {
-        const date = new Date()
-        date.setMonth(date.getMonth() - i)
-        const month = date.toLocaleString('pt-BR', { month: 'short' })
+      for (let month = 0; month < 12; month++) {
+        const date = new Date(currentYear, month, 1)
+        const monthName = date.toLocaleString('pt-BR', { month: 'short' })
         
         const monthTransactions = transactions?.filter(t => {
           const tDate = new Date(t.date)
-          return tDate.getMonth() === date.getMonth() && tDate.getFullYear() === date.getFullYear()
+          return tDate.getMonth() === month && tDate.getFullYear() === currentYear
         }) || []
 
         const monthIncome = monthTransactions
@@ -87,10 +87,36 @@ export default function DashboardPage() {
           .reduce((sum, t) => sum + t.amount, 0)
 
         monthsData.push({
-          month,
+          month: monthName,
           income: monthIncome,
           expenses: monthExpenses,
           balance: monthIncome - monthExpenses
+        })
+      }
+
+      // Prepare current month daily chart data
+      const currentMonthDailyData: Array<{day: string, income: number, expenses: number, balance: number}> = []
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayTransactions = currentMonthTransactions.filter(t => {
+          const tDate = new Date(t.date)
+          return tDate.getDate() === day
+        })
+
+        const dayIncome = dayTransactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + t.amount, 0)
+
+        const dayExpenses = dayTransactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + t.amount, 0)
+
+        currentMonthDailyData.push({
+          day: day.toString(),
+          income: dayIncome,
+          expenses: dayExpenses,
+          balance: dayIncome - dayExpenses
         })
       }
 
@@ -101,7 +127,8 @@ export default function DashboardPage() {
         scheduledCount: scheduled?.length || 0
       })
 
-      setChartData(monthsData)
+      setMonthlyChartData(monthsData)
+      setCurrentMonthDailyData(currentMonthDailyData)
       setRecentTransactions(transactions?.slice(0, 5) || [])
       setScheduledTransactions(scheduled?.slice(0, 5) || [])
     } catch (error) {
@@ -142,7 +169,7 @@ export default function DashboardPage() {
         scheduledCount={stats.scheduledCount}
       />
 
-      <FinancialChart data={chartData} />
+      <FinancialChart monthlyData={monthlyChartData} currentMonthData={currentMonthDailyData} />
 
       <div className="grid gap-6 md:grid-cols-2">
         <RecentTransactions transactions={recentTransactions} />
