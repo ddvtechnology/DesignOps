@@ -11,6 +11,11 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'DesignOps - CRM Financeiro para Designers',
   description: 'Gerencie seus projetos, clientes e finanças em um só lugar',
+  icons: {
+    icon: '/iconpage-designops.png',
+    shortcut: '/iconpage-designops.png',
+    apple: '/iconpage-designops.png',
+  },
 }
 
 export default function RootLayout({
