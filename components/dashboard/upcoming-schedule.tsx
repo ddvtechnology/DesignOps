@@ -3,8 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Calendar, AlertCircle, CheckCircle, Clock } from 'lucide-react'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatDateUTC } from '@/lib/utils'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -88,7 +87,7 @@ export function UpcomingSchedule({ scheduledTransactions }: UpcomingScheduleProp
                   <div>
                     <p className="font-medium text-sm">{transaction.description}</p>
                     <p className="text-xs text-muted-foreground">
-                      {format(new Date(transaction.scheduled_date), 'dd/MM/yyyy', { locale: ptBR })}
+                      {formatDateUTC(transaction.scheduled_date)}
                     </p>
                   </div>
                 </div>
