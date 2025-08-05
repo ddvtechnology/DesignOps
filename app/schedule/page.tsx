@@ -12,8 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useToast } from '@/hooks/use-toast'
 import { Plus, Calendar, AlertCircle, CheckCircle, Clock, Trash2, Search } from 'lucide-react'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+
 import { getUserScheduleAlerts, formatDateUTC } from '@/lib/utils'
 
 const categories = [

@@ -14,6 +14,7 @@ import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
 import { format, startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { formatDateUTC } from '@/lib/utils'
 
 export default function ReportsPage() {
   const { user } = useAuth()
@@ -205,7 +206,7 @@ export default function ReportsPage() {
           }
           
           pdf.setFontSize(8)
-          pdf.text(format(new Date(transaction.date), 'dd/MM/yy'), 20, yPos)
+          pdf.text(formatDateUTC(transaction.date).slice(0, 8), 20, yPos)
           
           // Limpar texto de caracteres especiais
           const cleanDescription = transaction.description
@@ -464,12 +465,12 @@ export default function ReportsPage() {
       // Aba de transações (se incluída)
       if (filters.includeTransactions && filteredData.transactions.length > 0) {
         const transactionsData = filteredData.transactions.map(t => ({
-        Data: format(new Date(t.date), 'dd/MM/yyyy'),
+        Data: formatDateUTC(t.date),
         Descrição: t.description,
           Categoria: t.category,
           Tipo: t.type === 'income' ? 'Receita' : 'Despesa',
         Valor: t.amount,
-          'Criado em': format(new Date(t.created_at), 'dd/MM/yyyy HH:mm')
+          'Criado em': formatDateUTC(t.created_at)
       }))
       
       const transactionsSheet = XLSX.utils.json_to_sheet(transactionsData)
@@ -521,7 +522,7 @@ export default function ReportsPage() {
           Email: c.email || 'Não informado',
           Telefone: c.phone || 'Não informado',
           Observações: c.notes || 'Sem observações',
-          'Cadastrado em': format(new Date(c.created_at), 'dd/MM/yyyy HH:mm')
+          'Cadastrado em': formatDateUTC(c.created_at)
       }))
       
       const clientsSheet = XLSX.utils.json_to_sheet(clientsData)
@@ -538,8 +539,8 @@ export default function ReportsPage() {
         Valor: p.value,
         Status: p.status === 'in_progress' ? 'Em Andamento' : 
                 p.status === 'completed' ? 'Concluído' : 'Cancelado',
-          Prazo: p.deadline ? format(new Date(p.deadline), 'dd/MM/yyyy') : 'Não definido',
-          'Criado em': format(new Date(p.created_at), 'dd/MM/yyyy HH:mm')
+          Prazo: p.deadline ? formatDateUTC(p.deadline) : 'Não definido',
+          'Criado em': formatDateUTC(p.created_at)
       }))
       
       const projectsSheet = XLSX.utils.json_to_sheet(projectsData)

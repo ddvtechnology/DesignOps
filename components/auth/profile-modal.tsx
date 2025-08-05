@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/hooks/use-toast'
 import { User, Lock, Mail, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { formatDateUTC } from '@/lib/utils'
 
 interface ProfileModalProps {
   open: boolean
@@ -123,7 +124,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
                   <p className="text-sm font-medium">Usuário</p>
                   <p className="text-sm text-muted-foreground">{user?.email}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Membro desde {user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : 'N/A'}
+                    Membro desde {user?.created_at ? formatDateUTC(user.created_at) : 'N/A'}
                   </p>
                 </div>
               </div>
